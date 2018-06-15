@@ -6,6 +6,7 @@ let position_to_string pos =
 (* 環境。名前と term を紐付ける *)
 let empty_context : (string * term) list = []
 
+
 exception LambdaError of string
 
 let rec term_to_string term =
@@ -23,7 +24,7 @@ let rec apply ctx t1 t2 =
   |_ ->
       (* t1 がλ抽象出ないときはそっともとに戻しておく *)
       (ctx, TmApp(Lexing.dummy_pos, t1, t2))
-  
+
 and eval ctx term =
   match term with
   |TmVar(_, v) ->
@@ -38,11 +39,12 @@ and eval ctx term =
       let _, t2' = eval ctx t2 in
       let ctx', t1' = eval ctx t1 in
       apply ctx' t1' t2'
-  |TmAbs(p, v, t) ->
-      (* 関数の中身を簡約する。引数が環境に結びついてないけどうまく動く *)
-      let _, t' = eval ctx t in
-      (ctx, TmAbs(p, v, t'))
+  |_ -> (ctx, term)
 
+let rec context_of_string ctx =
+  match ctx with
+  |(n, t)::xs -> n ^ "->" ^ (term_to_string t) ^ ", " ^ (context_of_string xs)
+  |[] -> ""
 
 let () =
   let ctx = ref [] in
@@ -60,9 +62,9 @@ let () =
     |Assign(_, v, t) ->
         begin
           print_endline ("->" ^ term_to_string t);
-          let _, r = eval !ctx t in 
+          let ctx', r = eval !ctx t in 
           print_endline ("->" ^ term_to_string r);
-          ctx := (v, r)::!ctx;
+          ctx := (v, r)::ctx';
         end
   done
 
