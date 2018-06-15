@@ -43,8 +43,22 @@ and eval ctx term =
 
 
 let () =
-  let t = Parser.parse Lexer.main (Lexing.from_channel stdin) in
-  print_endline (term_to_string t);
-  let _, r = eval empty_context t in 
-  print_endline (term_to_string r);
+  let ctx = ref [] in
+  while true do
+    let stmt = Parser.parse Lexer.main (Lexing.from_channel stdin) in
+    match stmt with
+    |Term(t) ->
+        begin
+          print_endline ("->" ^ term_to_string t);
+          let _, r = eval !ctx t in 
+          print_endline ("->" ^ term_to_string r);
+        end
+    |Assign(_, v, t) ->
+        begin
+          print_endline ("->" ^ term_to_string t);
+          let _, r = eval !ctx t in 
+          print_endline ("->" ^ term_to_string r);
+          ctx := (v, r)::!ctx;
+        end
+  done
 

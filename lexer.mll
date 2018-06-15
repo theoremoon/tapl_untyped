@@ -4,8 +4,9 @@ rule main = parse
 | ')' { Parser.RPAREN }
 | '.' { Parser.DOT }
 | '\\' { Parser.LAMBDA }
-| ['a'-'z'] as id {
-  Parser.STR(String.make 1 id)
+| ['a'-'z']+ as id {
+  Parser.STR(id)
 }
+| '=' { Parser.EQUAL }
 | '\n' { Parser.EOL }
 | eof { exit 1 }
