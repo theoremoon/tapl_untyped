@@ -20,7 +20,9 @@ let rec apply ctx t1 t2 =
   |TmAbs(_, v, t) ->
       let ctx' = (v, t2)::ctx in
       eval ctx' t
-  |_ -> raise (LambdaError "program error")
+  |_ ->
+      (* t1 がλ抽象出ないときはそっともとに戻しておく *)
+      (ctx, TmApp(Lexing.dummy_pos, t1, t2))
   
 and eval ctx term =
   match term with
@@ -45,6 +47,8 @@ and eval ctx term =
 let () =
   let ctx = ref [] in
   while true do
+    print_string ">";
+    flush stdout;
     let stmt = Parser.parse Lexer.main (Lexing.from_channel stdin) in
     match stmt with
     |Term(t) ->
