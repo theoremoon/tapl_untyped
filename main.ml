@@ -14,6 +14,7 @@ let rec term_to_string term =
   |TmAbs(_, v, t) -> "(λ" ^ v ^ ". " ^ term_to_string t ^ ")"
   |TmApp(_, t1, t2) -> "(" ^ (term_to_string t1) ^ " " ^ (term_to_string t2) ^ ")"
 
+(* 関数の適用 *)
 let rec apply ctx t1 t2 =
   match t1 with
   |TmAbs(_, v, t) ->
@@ -28,14 +29,17 @@ and eval ctx term =
         try
           let v' = List.assoc v ctx in
           (ctx, v')
+        (* 見つからなかったときに id 関数のように振る舞うことで未定義の変数を使えて便利 *)
         with Not_found -> (ctx, term)
       end
   |TmApp(_, t1, t2) ->
       let _, t2' = eval ctx t2 in
       let ctx', t1' = eval ctx t1 in
       apply ctx' t1' t2'
-  |_ -> (ctx, term)
-
+  |TmAbs(p, v, t) ->
+      (* 関数の中身を簡約する。引数が環境に結びついてないけどうまく動く *)
+      let _, t' = eval ctx t in
+      (ctx, TmAbs(p, v, t'))
 
 
 let () =
