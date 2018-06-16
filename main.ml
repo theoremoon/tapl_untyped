@@ -49,22 +49,26 @@ let rec context_of_string ctx =
 let () =
   let ctx = ref [] in
   while true do
-    print_string ">";
-    flush stdout;
-    let stmt = Parser.parse Lexer.main (Lexing.from_channel stdin) in
-    match stmt with
-    |Term(t) ->
-        begin
-          print_endline ("->" ^ term_to_string t);
-          let _, r = eval !ctx t in 
-          print_endline ("->" ^ term_to_string r);
-        end
-    |Assign(_, v, t) ->
-        begin
-          print_endline ("->" ^ term_to_string t);
-          let ctx', r = eval !ctx t in 
-          print_endline ("->" ^ term_to_string r);
-          ctx := (v, r)::ctx';
-        end
+    try
+      print_string ">";
+      flush stdout;
+      let stmt = Parser.parse Lexer.main (Lexing.from_channel stdin) in
+      match stmt with
+      |Term(t) ->
+          begin
+            print_endline ("->" ^ term_to_string t);
+            let _, r = eval !ctx t in 
+            print_endline ("->" ^ term_to_string r);
+            print_endline ("["^context_of_string !ctx^"]")
+          end
+      |Assign(_, v, t) ->
+          begin
+            print_endline ("->" ^ term_to_string t);
+            let ctx', r = eval !ctx t in 
+            ctx := (v, r)::ctx';
+            print_endline ("->" ^ term_to_string r);
+            print_endline ("["^context_of_string !ctx^"]")
+          end
+    with Parser.Error -> print_endline "[error] syntax error."
   done
 
