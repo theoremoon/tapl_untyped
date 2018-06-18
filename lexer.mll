@@ -6,7 +6,7 @@ rule main = parse
 | ')' { Parser.RPAREN }
 | '.' { Parser.DOT }
 | '\\' { Parser.LAMBDA }
-| (['a'-'z'] | num)+ as id {
+| ['a'-'z'] (['a'-'z'] | num)* as id {
   Parser.STR(id)
 }
 | '=' { Parser.EQUAL }
