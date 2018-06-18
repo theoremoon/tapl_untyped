@@ -92,7 +92,7 @@ let interpret ch debug repl =
   while not !isend do
     try
       if repl then begin
-        print_string ">";
+        print_string "> ";
         flush stdout
       end;
 
@@ -105,6 +105,8 @@ let interpret ch debug repl =
             if repl then
               print_string "->";
             print_endline (cls_to_string r);
+            if repl then
+              print_newline ();
           end
       |Assign(_, name, t) ->
           begin
@@ -113,6 +115,8 @@ let interpret ch debug repl =
             if repl then
               print_string "->";
             print_endline (cls_to_string (r, ctx'));
+            if repl then
+              print_newline ();
 
             ctx := (name, (r, ctx'))::!ctx
           end
