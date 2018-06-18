@@ -1,0 +1,7 @@
+true = \t.\f.t
+false = \t.\f.t
+
+true x y
+false x y
+true x
+false x

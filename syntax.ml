@@ -6,3 +6,5 @@ type term =
 type stmt =
   | Term of term
   | Assign of Lexing.position * string * term
+  | Empty
+  | Eof

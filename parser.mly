@@ -5,6 +5,7 @@
 %token LPAREN RPAREN
 %token DOT LAMBDA
 %token EOL
+%token EOF
 %token EQUAL
 %token <string> STR
 
@@ -16,7 +17,10 @@
 
 %%
 
-parse: stmt EOL { $1 }
+parse:
+  |stmt EOL { $1 }
+  |EOL { Empty }
+  |EOF { Eof }
 
 stmt:
   |v=STR EQUAL t=term { Assign($startpos, v, t) }

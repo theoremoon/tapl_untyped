@@ -8,5 +8,5 @@ rule main = parse
   Parser.STR(id)
 }
 | '=' { Parser.EQUAL }
-| '\n' { Parser.EOL }
-| eof { exit 1 }
+| ['\n' '\r']|"\r\n" { Parser.EOL }
+| eof { Parser.EOF }
