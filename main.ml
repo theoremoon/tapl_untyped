@@ -1,13 +1,13 @@
 open Syntax
 
-let position_to_string pos = 
-  "file:" ^ pos.Lexing.pos_fname ^ ", line:" ^ string_of_int(pos.Lexing.pos_lnum) ^ ", col:" ^ string_of_int(pos.Lexing.pos_cnum)
-
 exception LambdaError of string
 
 type context =
   |Bind of string * term * context
   |Empty
+
+let position_to_string pos = 
+  "file:" ^ pos.Lexing.pos_fname ^ ", line:" ^ string_of_int(pos.Lexing.pos_lnum) ^ ", col:" ^ string_of_int(pos.Lexing.pos_cnum)
 
 let rec term_to_string term =
   match term with
@@ -116,14 +116,12 @@ let interpret ch debug repl =
 
             ctx := (name, (r, ctx'))::!ctx
           end
-      |Eof -> isend := true
+      |Eof -> (print_endline "EOF"; isend := true)
       |_ -> ()
     with Parser.Error ->
       let p = (Lexing.from_channel ch).lex_curr_p in
-      let linestr = "Line: " ^ string_of_int (p.pos_lnum) in
-      let colstr = "pos: " ^ string_of_int (p.pos_cnum) in
 
-      prerr_endline ("[error] syntax error at " ^ linestr ^ colstr)
+      prerr_endline ("[error] syntax error at " ^ position_to_string p)
   done
 
 let () =
@@ -145,5 +143,9 @@ let () =
       done;
 
       List.iter (fun ch ->
-        interpret ch !debug false) !files
+        begin
+          interpret ch !debug false;
+          close_in ch
+        end
+      ) !files
     end
